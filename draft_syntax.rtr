@@ -3,7 +3,7 @@ var cookie = 'hello world'
 var response = req POST 'http://google.com' {
     headers {
         x-my-header: 'hello'
-        Cookie: $cookie
+        Cookie: cookie
     }
 
     json {
@@ -28,4 +28,5 @@ stress 100 workers 10 {
             "example": "json"
         }
     }
+    print response.body
 }

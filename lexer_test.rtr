@@ -1,1 +1,7 @@
 = { == ) 'this is my string'  // hello world
+123.45
+123
+var test = 'hello'
+POST GET PUT DELETE PATCH json headers req
+
+print test
