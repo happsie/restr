@@ -1,0 +1,31 @@
+var cookie = 'hello world'
+
+var response = req POST 'http://google.com' {
+    headers {
+        x-my-header: 'hello'
+        Cookie: $cookie
+    }
+
+    json {
+        "example": "json"
+    }
+}
+
+
+stress 100 workers 10 {
+    var response = req POST 'http://google.com' {
+        headers {
+            x-my-header: 'hello'
+            Cookie: $cookie
+        }
+
+        metrics {
+            capture latency
+            capture status
+        }
+
+        json {
+            "example": "json"
+        }
+    }
+}
