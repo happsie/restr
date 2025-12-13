@@ -1,4 +1,4 @@
-package main
+package lexer
 
 import (
 	"fmt"
@@ -69,7 +69,7 @@ type Scanner struct {
 	tokens  []Token
 }
 
-func (s *Scanner) Tokenize(code string) ([]Token, error) {
+func (s *Scanner) FindTokens(code string) ([]Token, error) {
 	for i, row := range strings.Split(code, "\n") {
 		fmt.Printf("Converting line %d to tokens\n", i)
 		s.source = row

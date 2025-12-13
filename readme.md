@@ -46,3 +46,7 @@ stress 100 workers 10 {
     print response.body
 }
 ```
+
+### AI
+
+This project is NOT built with AI.
