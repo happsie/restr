@@ -35,6 +35,16 @@ type Identifier struct {
 	Name string
 }
 
+type ReqExpression struct {
+	Method string
+	URL    Expression
+	Blocks []ReqBlock
+}
+
+type ReqBlock interface {
+	reqBlock()
+}
+
 func (*Program) node() {}
 
 func (*VarDeclaration) node() {
@@ -68,3 +78,30 @@ func (*Identifier) node() {
 func (*Identifier) expr() {
 
 }
+
+func (*ReqExpression) node() {
+
+}
+
+func (*ReqExpression) expr() {
+
+}
+
+type HeadersBlock struct {
+	Pairs map[string]Expression
+}
+
+func (*HeadersBlock) reqBlock() {}
+
+type JsonBlock struct {
+	Value map[string]Expression
+}
+
+func (*JsonBlock) reqBlock() {}
+
+type BlockStatement struct {
+	Statements []Statement
+}
+
+func (*BlockStatement) stmt() {}
+func (*BlockStatement) node() {}

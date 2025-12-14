@@ -48,6 +48,6 @@ func (a *Analyzer) analyzeExpr(expr lexer.Expression) error {
 		}
 		return nil
 	default:
-		return fmt.Errorf("unknown expression")
+		return fmt.Errorf("unknown expression: %v", expr)
 	}
 }

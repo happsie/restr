@@ -2,6 +2,8 @@ package runtime
 
 import (
 	"fmt"
+	"io"
+	"net/http"
 	"restr/internal/lexer"
 )
 
@@ -38,7 +40,43 @@ func (i *Interpreter) evalExpr(expr lexer.Expression) any {
 		return e.Value
 	case *lexer.Identifier:
 		return i.env.Get(e.Name)
+	case *lexer.ReqExpression:
+		return i.evalReq(e)
 	default:
-		panic("unknown expression")
+		panic(fmt.Errorf("unknown expression: %v", expr))
+	}
+}
+
+type HttpResponse struct {
+	Body    string
+	Status  int
+	Headers map[string]string
+}
+
+func (i *Interpreter) evalReq(req *lexer.ReqExpression) HttpResponse {
+	url := i.evalExpr(req.URL).(string)
+
+	client := http.DefaultClient
+
+	r, err := http.NewRequest(req.Method, url, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	resp, err := client.Do(r)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		panic(body)
+	}
+	return HttpResponse{
+		Body:   string(body),
+		Status: resp.StatusCode,
+		Headers: map[string]string{
+			"test": "test",
+		},
 	}
 }

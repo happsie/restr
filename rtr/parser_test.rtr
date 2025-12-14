@@ -1,2 +1,5 @@
 var hello = 'world'
 print hello
+
+var response = req GET 'http://google.com' { } // TODO: RIGHT Brace verkar inte konsumeras och används som stmt?
+print response

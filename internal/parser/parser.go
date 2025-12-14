@@ -28,14 +28,14 @@ func (p *Parser) advance() lexer.Token {
 }
 
 func (p *Parser) parseExpression() lexer.Expression {
-	tok := p.current()
+	token := p.current()
 
-	switch tok.Type {
+	switch token.Type {
 	case lexer.STRING:
 		p.advance()
-		str, ok := tok.Literal.(string)
+		str, ok := token.Literal.(string)
 		if !ok {
-			panic("could not parse string expression" + tok.Lexeme)
+			panic("could not parse string expression: " + token.Lexeme)
 		}
 		return &lexer.StringLiteral{
 			Value: str,
@@ -44,13 +44,15 @@ func (p *Parser) parseExpression() lexer.Expression {
 	case lexer.IDENTIFIER:
 		p.advance()
 		return &lexer.Identifier{
-			Name: tok.Lexeme,
+			Name: token.Lexeme,
 		}
+	case lexer.REQ:
+		return p.parseReqExpression()
 
 	default:
 		panic(fmt.Sprintf(
 			"unexpected token in expression: %s",
-			tok.Type,
+			token.Type,
 		))
 	}
 }
@@ -85,9 +87,47 @@ func (p *Parser) parseStatement() lexer.Statement {
 		return p.parseVarDeclaration()
 	case lexer.PRINT:
 		return p.parsePrintStatement()
+	case lexer.LEFT_BRACE:
+		return p.parseBlockStatement()
 	default:
 		panic("could not parse statement" + p.current().Type)
 	}
+}
+
+func (p *Parser) parseReqExpression() lexer.Expression {
+	p.expect(lexer.REQ)
+
+	method := p.expect(lexer.GET).Lexeme // TODO: really lexeme?
+	url := p.parseExpression()
+
+	return &lexer.ReqExpression{
+		Method: method,
+		URL:    url,
+		Blocks: []lexer.ReqBlock{},
+	}
+}
+
+func (p *Parser) parseBlockStatement() lexer.Statement {
+	p.expect(lexer.LEFT_BRACE)
+
+	stmts := []lexer.Statement{}
+
+	for p.current().Type != lexer.RIGHT_BRACE {
+		stmts = append(stmts, p.parseStatement())
+	}
+
+	p.expect(lexer.RIGHT_BRACE)
+
+	return &lexer.BlockStatement{
+		Statements: stmts,
+	}
+}
+
+func (p *Parser) expect(t lexer.TokenType) lexer.Token {
+	if p.current().Type != t {
+		panic("expected " + t + ", got " + p.current().Type)
+	}
+	return p.advance()
 }
 
 func (p *Parser) ParseProgram() lexer.Program {
